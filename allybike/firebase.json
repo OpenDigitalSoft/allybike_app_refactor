@@ -1,0 +1,30 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "allybike-80181",
+          "appId": "1:122656271145:android:c95b52ae4a9da3cbe1a538",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "allybike-80181",
+          "configurations": {
+            "android": "1:122656271145:android:c95b52ae4a9da3cbe1a538",
+            "ios": "1:122656271145:ios:1e4338d4f9842139e1a538"
+          }
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "allybike-80181",
+          "appId": "1:122656271145:ios:1e4338d4f9842139e1a538",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      }
+    }
+  }
+}

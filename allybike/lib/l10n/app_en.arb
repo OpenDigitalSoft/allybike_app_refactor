@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+  "login_title": "Hello, Welcome!",
+  "@login_title": {
+    "context": "LoginView"
+  },
+  "login_subtitle": "Sing in",
+  "@login_subtitle": {
+    "context": "LoginView"
+  },
+  "home_level": "Level",
+  "@home_level": {
+    "context": "HomeView"
+  }
+}

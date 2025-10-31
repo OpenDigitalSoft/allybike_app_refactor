@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "122656271145",
+    "project_id": "allybike-80181",
+    "storage_bucket": "allybike-80181.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122656271145:android:1a1333830b2e857fe1a538",
+        "android_client_info": {
+          "package_name": "com.allybike.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "122656271145-3lcto9sidko4fh5bm5gj9cgpgeacgfuj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-UAm4hz6oCu3V1Ve3XmrDSsi7yhkkCbw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "122656271145-3lcto9sidko4fh5bm5gj9cgpgeacgfuj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "122656271145-5ju8g6hkfsifn1au980dmlba85dvtsep.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.allybikeapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

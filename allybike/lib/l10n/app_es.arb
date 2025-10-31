@@ -1,0 +1,15 @@
+{
+  "@@locale": "es",
+  "login_title": "¡Hola, bienvenido!",
+  "@login_title": {
+    "context": "LoginView"
+  },
+  "login_subtitle": "Ingresa a tu cuenta",
+  "@login_subtitle": {
+    "context": "LoginView"
+  },
+  "home_level": "Nivel",
+  "@home_level": {
+    "context": "HomeView"
+  }
+}
