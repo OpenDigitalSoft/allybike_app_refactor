@@ -3,10 +3,10 @@ import 'package:allybike/login/data/apple-auth.repository.dart';
 import 'package:allybike/login/data/google-auth.repository.dart';
 import 'package:allybike/login/data/login.repository.dart';
 import 'package:allybike/login/models/firebase-auth-response.model.dart';
+import 'package:allybike/storage/data/storage.repocitory.dart';
 import 'package:allybike/user/models/user.model.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
 part 'login_state.dart';
@@ -24,7 +24,7 @@ abstract class ILoginCubit {
 class LoginCubit extends Cubit<LoginState> implements ILoginCubit {
 
   final ILoginRepository repository;
-  final FlutterSecureStorage storage;
+  final IStorageRepository storage;
   final IGoogleAuthRepository googleAuthRepository;
   final IAppleAuthRepository appleAuthRepository;
 

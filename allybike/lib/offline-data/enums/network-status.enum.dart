@@ -1,1 +1,6 @@
-enum NetworkStatus { connected, disconnected }
+enum NetworkStatus {
+  connectedInternet,
+  disconnected,
+  connectedWifi,
+  connectedMobile,
+}

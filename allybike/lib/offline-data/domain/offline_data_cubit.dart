@@ -1,14 +1,15 @@
 import 'dart:async';
 
 import 'package:allybike/class/result.class.dart';
+import 'package:allybike/offline-data/data/conncetivity.repocitory.dart';
 import 'package:allybike/offline-data/data/offline_data.repository.dart';
+import 'package:allybike/offline-data/enums/network-status.enum.dart';
 import 'package:allybike/offline-data/enums/sync-status.enum.dart';
 import 'package:allybike/offline-data/models/image.model.dart';
 import 'package:allybike/offline-data/models/points.model.dart';
 import 'package:allybike/offline-data/models/route.model.dart';
 import 'package:allybike/offline-data/models/site.model.dart';
 import 'package:allybike/routes/data/route.repository.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:injectable/injectable.dart';
@@ -19,14 +20,14 @@ part 'offline_data_state.dart';
 class OfflineDataCubit extends HydratedCubit<OfflineDataState> {
   final IRouteRepository _routeRepository;
   final IOfflineDataRepository _offlineDataRepository;
-  final Connectivity _connectivity;
+  final IConnectivityRepository _connectivity;
 
-  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+  StreamSubscription<NetworkStatus>? _connectivitySubscription;
 
   OfflineDataCubit({
     required IRouteRepository routeRepository,
     required IOfflineDataRepository offlineDataRepository,
-    required Connectivity connectivity,
+    required IConnectivityRepository connectivity,
   }) : _routeRepository = routeRepository,
        _offlineDataRepository = offlineDataRepository,
        _connectivity = connectivity,
@@ -47,64 +48,70 @@ class OfflineDataCubit extends HydratedCubit<OfflineDataState> {
   }
 
   void listenToConnectivityChanges() {
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen((
-      result,
+    _connectivitySubscription = _connectivity.getStreamNetworkStatus().listen((
+      status,
     ) async {
-      if (result.contains(ConnectivityResult.wifi) ||
-          result.contains(ConnectivityResult.mobile)) {
+      if (status == NetworkStatus.connectedWifi ||
+          status == NetworkStatus.connectedMobile) {
         await syncData();
       }
     });
   }
 
   Future<void> syncData() async {
-    if (state is! OfflineDataLoaded) {
-      return;
-    }
-    final currentState = state as OfflineDataLoaded;
-    if (currentState.routesOfflineData.isEmpty) {
-      return;
-    }
-    if (currentState.isSyncing) {
-      return;
-    }
+    if (state is! OfflineDataLoaded) return;
+    var currentState = state as OfflineDataLoaded;
+    if (currentState.routesOfflineData.isEmpty) return;
+    if (currentState.isSyncing) return;
+
     final isConnected = await _verifyConnectivityApi();
     if (!isConnected) {
       emit(currentState.copyWith(isSyncing: false));
       return;
     }
+
     emit(currentState.copyWith(isSyncing: true));
+    currentState = state as OfflineDataLoaded; // refrescamos referencia
+
     for (final routeData in currentState.routesOfflineData) {
       final savedSites = await _saveSites(routeData.sites);
       final savedImageRoute = await _saveImageRoute(routeData.imageRoute);
       final savedPointsRoute = await _savePointsRoute(routeData.pointsRoute);
+
       final sitesPending = savedSites
           .where((site) => site.syncStatus == SyncStatus.pending)
           .toList();
+
       if (sitesPending.isNotEmpty ||
           savedImageRoute.syncStatus == SyncStatus.pending ||
           savedPointsRoute.syncStatus == SyncStatus.pending) {
-          emit(currentState.copyWith(
-            routesOfflineData: currentState.routesOfflineData.map((route) {
-              if (route.id != routeData.id) {
-                return route;
-              }
-              return route.copyWith(
-                sites: sitesPending,
-                imageRoute: savedImageRoute,
-                pointsRoute: savedPointsRoute,
-              );
-            }).toList(),
-          ));
-          continue;
+        emit((state as OfflineDataLoaded).copyWith(
+          routesOfflineData: (state as OfflineDataLoaded)
+              .routesOfflineData
+              .map((route) {
+                if (route.id != routeData.id) return route;
+                return route.copyWith(
+                  sites: sitesPending,
+                  imageRoute: savedImageRoute,
+                  pointsRoute: savedPointsRoute,
+                );
+              })
+              .toList(),
+        ));
+        currentState = state as OfflineDataLoaded; // actualizar snapshot
+        continue;
       }
-       emit(currentState.copyWith(
-         routesOfflineData: currentState.routesOfflineData
-             .where((route) => route.id != routeData.id)
-             .toList(),
-       ));
+
+      emit((state as OfflineDataLoaded).copyWith(
+        routesOfflineData: (state as OfflineDataLoaded)
+            .routesOfflineData
+            .where((route) => route.id != routeData.id)
+            .toList(),
+      ));
+      currentState = state as OfflineDataLoaded; // actualizar snapshot
     }
-    emit(currentState.copyWith(isSyncing: false));
+
+    emit((state as OfflineDataLoaded).copyWith(isSyncing: false));
   }
 
   _changeRouteDataOffline() {

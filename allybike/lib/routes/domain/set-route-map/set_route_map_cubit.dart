@@ -13,8 +13,8 @@ part 'set_route_map_state.dart';
 
 @injectable
 class SetRouteMapCubit extends Cubit<SetRouteMapState> {
-  final ImagePickerRepository imagePickerRepository;
-  final GeolocatorRepository geolocatorRepository;
+  final IImagePickerRepository imagePickerRepository;
+  final IGeolocatorRepository geolocatorRepository;
 
   SetRouteMapCubit({
     required this.imagePickerRepository,

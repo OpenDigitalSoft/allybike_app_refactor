@@ -10,7 +10,7 @@ part 'type_route_state.dart';
 @lazySingleton
 class TypeRouteCubit extends Cubit<TypeRouteState> {
 
-  final TypeRouteRepository repository;
+  final ITypeRouteRepository repository;
   TypeRouteCubit({required this.repository}) : super(TypeRouteInitial());
   
 

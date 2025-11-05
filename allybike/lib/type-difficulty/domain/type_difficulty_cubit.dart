@@ -10,7 +10,7 @@ part 'type_difficulty_state.dart';
 @lazySingleton
 class TypeDifficultyCubit extends Cubit<TypeDifficultyState> {
 
-  final TypeDifficultyRepository repository;
+  final ITypeDifficultyRepository repository;
   TypeDifficultyCubit({required this.repository}) : super(TypeDifficultyInitial());
   
   

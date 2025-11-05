@@ -2,10 +2,10 @@ import 'package:allybike/login/data/apple-auth.repository.dart';
 import 'package:allybike/login/data/google-auth.repository.dart';
 import 'package:allybike/register/data/register.repository.dart';
 import 'package:allybike/register/models/register-user.model.dart';
+import 'package:allybike/storage/data/storage.repocitory.dart';
 import 'package:allybike/user/models/user.model.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
 part 'register_state.dart';
@@ -13,10 +13,10 @@ part 'register_state.dart';
 @injectable
 class RegisterCubit extends Cubit<RegisterState> {
 
-  final RegisterRepository repository;
-  final FlutterSecureStorage storage;
-  final GoogleAuthRepository googleAuthRepository;
-  final AppleAuthRepository appleAuthRepository;
+  final IRegisterRepository repository;
+  final IStorageRepository storage;
+  final IGoogleAuthRepository googleAuthRepository;
+  final IAppleAuthRepository appleAuthRepository;
   RegisterCubit({
     required this.repository,
     required this.storage,

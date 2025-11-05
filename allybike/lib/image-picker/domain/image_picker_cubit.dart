@@ -11,7 +11,7 @@ part 'image_picker_state.dart';
 @injectable
 class ImagePickerCubit extends Cubit<ImagePickerState> {
 
-  final ImagePickerRepository imagePickerRepository;
+  final IImagePickerRepository imagePickerRepository;
   ImagePickerCubit({
     required this.imagePickerRepository,
   }) : super(ImagePickerInitial());

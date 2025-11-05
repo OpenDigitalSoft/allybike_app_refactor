@@ -11,8 +11,8 @@ part 'location_state.dart';
 
 @lazySingleton
 class LocationCubit extends Cubit<LocationState> {
-  final GeolocatorRepository geolocatorRepository;
-  final LocationRepository locationRepository;
+  final IGeolocatorRepository geolocatorRepository;
+  final ILocationRepository locationRepository;
   LocationCubit({
     required this.geolocatorRepository,
     required this.locationRepository,

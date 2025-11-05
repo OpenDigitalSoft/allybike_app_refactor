@@ -12,7 +12,7 @@ part 'route_state.dart';
 @lazySingleton
 class RouteCubit extends Cubit<RouteState>  {
 
-  final RouteRepository repository;
+  final IRouteRepository repository;
   RouteCubit({required this.repository}) : super(RouteInitial());
 
   Timer? _debounce;

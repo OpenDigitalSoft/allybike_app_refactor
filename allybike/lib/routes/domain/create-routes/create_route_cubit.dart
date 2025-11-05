@@ -8,7 +8,7 @@ part 'create_route_state.dart';
 @lazySingleton
 class CreateRouteCubit extends Cubit<CreateRouteState> {
 
-  final RouteRepository routeRepository;
+  final IRouteRepository routeRepository;
   CreateRouteCubit({required this.routeRepository})
     : super(CreateRouteInitial());
 

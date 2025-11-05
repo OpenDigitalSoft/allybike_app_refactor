@@ -10,7 +10,7 @@ part 'type_site_state.dart';
 @lazySingleton
 class TypeSiteCubit extends Cubit<TypeSiteState> {
 
-  final TypeSitesRepository typeSitesRepository;
+  final ITypeSitesRepository typeSitesRepository;
   TypeSiteCubit({required this.typeSitesRepository}) : super(TypeSiteInitial());
 
 

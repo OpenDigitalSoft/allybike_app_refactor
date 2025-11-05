@@ -9,7 +9,7 @@ part 'bike_ride_state.dart';
 
 @lazySingleton
 class BikeRideCubit extends Cubit<BikeRideState> {
-  final BikeRidesRepository repository;
+  final IBikeRidesRepository repository;
   BikeRideCubit({required this.repository}) : super(BikeRideInitial());
 
   getInitialDataBikeRide() async {

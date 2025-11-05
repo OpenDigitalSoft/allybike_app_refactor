@@ -7,7 +7,7 @@ part 'recovery_state.dart';
 
 @injectable
 class RecoveryCubit extends Cubit<RecoveryState> {
-  final RecoveryRepository repository;
+  final IRecoveryRepository repository;
 
   RecoveryCubit({required this.repository}) : super(RecoveryInitial());
 

@@ -25,6 +25,8 @@ import 'package:allybike/login/data/google-auth.repository.dart' as _i946;
 import 'package:allybike/login/data/login.repository.dart' as _i876;
 import 'package:allybike/login/domain/login_cubit.dart' as _i306;
 import 'package:allybike/module/external.module.dart' as _i95;
+import 'package:allybike/offline-data/data/conncetivity.repocitory.dart'
+    as _i933;
 import 'package:allybike/offline-data/data/offline_data.repository.dart'
     as _i488;
 import 'package:allybike/offline-data/domain/offline_data_cubit.dart' as _i749;
@@ -40,6 +42,7 @@ import 'package:allybike/routes/domain/routes-user/routes_user_cubit.dart'
 import 'package:allybike/routes/domain/routes/route_cubit.dart' as _i820;
 import 'package:allybike/routes/domain/set-route-map/set_route_map_cubit.dart'
     as _i716;
+import 'package:allybike/storage/data/storage.repocitory.dart' as _i904;
 import 'package:allybike/type-difficulty/data/type-difficulty.repository.dart'
     as _i709;
 import 'package:allybike/type-difficulty/domain/type_difficulty_cubit.dart'
@@ -78,22 +81,10 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i895.Connectivity>(() => externalModule.connectivity());
     gh.lazySingleton<_i154.UserCubit>(() => _i154.UserCubit());
     gh.lazySingleton<_i715.ErrorCubit>(() => _i715.ErrorCubit());
-    gh.lazySingleton<_i749.OfflineDataCubit>(
-      () => _i749.OfflineDataCubit(
-        routeRepository: gh<_i281.RouteRepository>(),
-        offlineDataRepository: gh<_i488.OfflineDataRepository>(),
-        connectivity: gh<_i895.Connectivity>(),
-      ),
-    );
     gh.factory<_i946.IGoogleAuthRepository>(
       () => _i946.GoogleAuthRepository(
         firebaseAuth: gh<_i59.FirebaseAuth>(),
         googleSignIn: gh<_i116.GoogleSignIn>(),
-      ),
-    );
-    gh.lazySingleton<_i702.TypeDifficultyCubit>(
-      () => _i702.TypeDifficultyCubit(
-        repository: gh<_i709.TypeDifficultyRepository>(),
       ),
     );
     gh.factory<_i568.IAppleAuthRepository>(
@@ -106,21 +97,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => externalModule.dio(),
       instanceName: 'api',
     );
-    gh.factory<_i719.RecoveryCubit>(
-      () => _i719.RecoveryCubit(repository: gh<_i141.RecoveryRepository>()),
-    );
     gh.factory<_i315.IGeolocatorRepository>(() => _i315.GeolocatorRepository());
-    gh.lazySingleton<_i968.TypeSiteCubit>(
-      () => _i968.TypeSiteCubit(
-        typeSitesRepository: gh<_i636.TypeSitesRepository>(),
-      ),
-    );
-    gh.lazySingleton<_i947.LocationCubit>(
-      () => _i947.LocationCubit(
-        geolocatorRepository: gh<_i315.GeolocatorRepository>(),
-        locationRepository: gh<_i420.LocationRepository>(),
-      ),
-    );
     gh.lazySingleton<_i521.Http>(
       () => _i521.Http(
         dio: gh<_i361.Dio>(instanceName: 'api'),
@@ -133,15 +110,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i636.ITypeSitesRepository>(
       () => _i636.TypeSitesRepository(http: gh<_i521.Http>()),
     );
-    gh.lazySingleton<_i986.CreateRouteCubit>(
-      () =>
-          _i986.CreateRouteCubit(routeRepository: gh<_i281.RouteRepository>()),
-    );
     gh.factory<_i24.IImagePickerRepository>(
       () => _i24.ImagePickerRepository(imagePicker: gh<_i183.ImagePicker>()),
     );
-    gh.lazySingleton<_i322.TypeRouteCubit>(
-      () => _i322.TypeRouteCubit(repository: gh<_i444.TypeRouteRepository>()),
+    gh.factory<_i904.IStorageRepository>(
+      () => _i904.StorageRepository(storage: gh<_i558.FlutterSecureStorage>()),
     );
     gh.factory<_i709.ITypeDifficultyRepository>(
       () => _i709.TypeDifficultyRepository(http: gh<_i521.Http>()),
@@ -149,47 +122,56 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i420.ILocationRepository>(
       () => _i420.LocationRepository(http: gh<_i521.Http>()),
     );
-    gh.factory<_i436.ImagePickerCubit>(
-      () => _i436.ImagePickerCubit(
-        imagePickerRepository: gh<_i24.ImagePickerRepository>(),
-      ),
-    );
     gh.lazySingleton<_i306.LoginCubit>(
       () => _i306.LoginCubit(
         repository: gh<_i876.ILoginRepository>(),
-        storage: gh<_i558.FlutterSecureStorage>(),
+        storage: gh<_i904.IStorageRepository>(),
         googleAuthRepository: gh<_i946.IGoogleAuthRepository>(),
         appleAuthRepository: gh<_i568.IAppleAuthRepository>(),
       ),
     );
-    gh.factory<_i854.RegisterCubit>(
-      () => _i854.RegisterCubit(
-        repository: gh<_i743.RegisterRepository>(),
-        storage: gh<_i558.FlutterSecureStorage>(),
-        googleAuthRepository: gh<_i946.GoogleAuthRepository>(),
-        appleAuthRepository: gh<_i568.AppleAuthRepository>(),
-      ),
-    );
-    gh.lazySingleton<_i398.RoutesUserCubit>(
-      () => _i398.RoutesUserCubit(repository: gh<_i281.RouteRepository>()),
-    );
-    gh.lazySingleton<_i820.RouteCubit>(
-      () => _i820.RouteCubit(repository: gh<_i281.RouteRepository>()),
-    );
     gh.singleton<_i824.BlocObserverData>(
       () => _i824.BlocObserverData(errorCubit: gh<_i715.ErrorCubit>()),
     );
-    gh.factory<_i716.SetRouteMapCubit>(
-      () => _i716.SetRouteMapCubit(
-        imagePickerRepository: gh<_i24.ImagePickerRepository>(),
-        geolocatorRepository: gh<_i315.GeolocatorRepository>(),
+    gh.lazySingleton<_i933.IConnectivityRepository>(
+      () =>
+          _i933.ConnectivityRepository(connectivity: gh<_i895.Connectivity>()),
+    );
+    gh.lazySingleton<_i702.TypeDifficultyCubit>(
+      () => _i702.TypeDifficultyCubit(
+        repository: gh<_i709.ITypeDifficultyRepository>(),
       ),
     );
     gh.factory<_i743.IRegisterRepository>(
       () => _i743.RegisterRepository(http: gh<_i521.Http>()),
     );
+    gh.lazySingleton<_i947.LocationCubit>(
+      () => _i947.LocationCubit(
+        geolocatorRepository: gh<_i315.IGeolocatorRepository>(),
+        locationRepository: gh<_i420.ILocationRepository>(),
+      ),
+    );
     gh.factory<_i141.IRecoveryRepository>(
       () => _i141.RecoveryRepository(http: gh<_i521.Http>()),
+    );
+    gh.lazySingleton<_i968.TypeSiteCubit>(
+      () => _i968.TypeSiteCubit(
+        typeSitesRepository: gh<_i636.ITypeSitesRepository>(),
+      ),
+    );
+    gh.factory<_i716.SetRouteMapCubit>(
+      () => _i716.SetRouteMapCubit(
+        imagePickerRepository: gh<_i24.IImagePickerRepository>(),
+        geolocatorRepository: gh<_i315.IGeolocatorRepository>(),
+      ),
+    );
+    gh.factory<_i436.ImagePickerCubit>(
+      () => _i436.ImagePickerCubit(
+        imagePickerRepository: gh<_i24.IImagePickerRepository>(),
+      ),
+    );
+    gh.factory<_i719.RecoveryCubit>(
+      () => _i719.RecoveryCubit(repository: gh<_i141.IRecoveryRepository>()),
     );
     gh.factory<_i488.IOfflineDataRepository>(
       () => _i488.OfflineDataRepository(http: gh<_i521.Http>()),
@@ -197,14 +179,42 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i444.ITypeRouteRepository>(
       () => _i444.TypeRouteRepository(http: gh<_i521.Http>()),
     );
+    gh.lazySingleton<_i322.TypeRouteCubit>(
+      () => _i322.TypeRouteCubit(repository: gh<_i444.ITypeRouteRepository>()),
+    );
     gh.factory<_i281.IRouteRepository>(
       () => _i281.RouteRepository(http: gh<_i521.Http>()),
     );
-    gh.factory<_i295.BikeRidesRepository>(
+    gh.factory<_i295.IBikeRidesRepository>(
       () => _i295.BikeRidesRepository(http: gh<_i521.Http>()),
     );
+    gh.factory<_i854.RegisterCubit>(
+      () => _i854.RegisterCubit(
+        repository: gh<_i743.IRegisterRepository>(),
+        storage: gh<_i904.IStorageRepository>(),
+        googleAuthRepository: gh<_i946.IGoogleAuthRepository>(),
+        appleAuthRepository: gh<_i568.IAppleAuthRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i749.OfflineDataCubit>(
+      () => _i749.OfflineDataCubit(
+        routeRepository: gh<_i281.IRouteRepository>(),
+        offlineDataRepository: gh<_i488.IOfflineDataRepository>(),
+        connectivity: gh<_i933.IConnectivityRepository>(),
+      ),
+    );
     gh.lazySingleton<_i497.BikeRideCubit>(
-      () => _i497.BikeRideCubit(repository: gh<_i295.BikeRidesRepository>()),
+      () => _i497.BikeRideCubit(repository: gh<_i295.IBikeRidesRepository>()),
+    );
+    gh.lazySingleton<_i986.CreateRouteCubit>(
+      () =>
+          _i986.CreateRouteCubit(routeRepository: gh<_i281.IRouteRepository>()),
+    );
+    gh.lazySingleton<_i398.RoutesUserCubit>(
+      () => _i398.RoutesUserCubit(repository: gh<_i281.IRouteRepository>()),
+    );
+    gh.lazySingleton<_i820.RouteCubit>(
+      () => _i820.RouteCubit(repository: gh<_i281.IRouteRepository>()),
     );
     return this;
   }
