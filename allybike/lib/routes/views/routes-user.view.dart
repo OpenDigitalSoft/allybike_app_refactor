@@ -1,7 +1,7 @@
 import 'package:allybike/const/colors.conts.dart';
 import 'package:allybike/enums/search-state.enum.dart';
 import 'package:allybike/routes/domain/routes-user/routes_user_cubit.dart';
-import 'package:allybike/routes/views/create-map-points-route.view.dart';
+import 'package:allybike/routes/views/create-route.view.dart';
 import 'package:allybike/routes/widgets/list-routes.widget.dart';
 import 'package:allybike/user/domain/user_cubit.dart';
 import 'package:allybike/widgets/appbars/appbar-home.widget.dart';
@@ -44,10 +44,7 @@ class RoutesUserView extends StatelessWidget {
                   ),
             ),
             floatingActionButton: FloatButton(
-                                 onPressed: () => Navigator.pushNamed(context, CreateMapPointsRoutes.route,arguments: {
-                                  'idRoute': 1,
-                                  'nameRoute': "Ruta de prueba",
-                                 }),
+                                 onPressed: () => Navigator.pushNamed(context,CreateRouteView.route),
                                  color: PaleteColors.red
                                  ),
     );

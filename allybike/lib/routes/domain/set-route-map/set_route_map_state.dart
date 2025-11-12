@@ -6,7 +6,7 @@ sealed class SetRouteMapState {}
 final class SetRouteMapInitial extends SetRouteMapState {}
 
 final class SetPositionCurrent extends SetRouteMapState {
-  final Position position;
+  final LatLng position;
   final List<LatLng> path;
   final bool isPaused;
   final File? photoRoute;
@@ -26,7 +26,7 @@ final class SetPositionCurrent extends SetRouteMapState {
   });
 
   SetPositionCurrent copyWith({
-    Position? position,
+    LatLng? position,
     List<LatLng>? path,
     bool? isPaused,
     File? photoRoute,

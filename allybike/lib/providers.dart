@@ -66,6 +66,7 @@ providers(BuildContext context) {
            dependencyRegister<TypeSiteCubit>()..getTypeSites()
      ),
      BlocProvider(
+       lazy: false,
        create: (context) =>
            dependencyRegister<OfflineDataCubit>()..listenToConnectivityChanges()
      ),

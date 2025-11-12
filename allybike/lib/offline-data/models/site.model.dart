@@ -1,8 +1,9 @@
 import 'package:allybike/offline-data/enums/sync-status.enum.dart';
-import 'package:dio/dio.dart';
+
 
 class SiteOffline {
   final int idRoute;
+  final int idType;
   final String description;
   final String photo;
   final double latitude;
@@ -15,11 +16,13 @@ class SiteOffline {
     required this.photo,
     required this.latitude,
     required this.longitude,
+    required this.idType,
     this.syncStatus = SyncStatus.pending,
   });
 
  SiteOffline copyWith({
     int? idRoute,
+    int? idType,
     String? description,
     String? photo,
     double? latitude,
@@ -33,19 +36,18 @@ class SiteOffline {
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       syncStatus: syncStatus ?? this.syncStatus,
+      idType: idType ?? this.idType,
     );
   }
 
-  Future<Map<String, dynamic>> toJson() async {
+  Map<String, dynamic> toJson() {
     return {
       'idRoute': idRoute,
       'description': description,
-      'photo': await MultipartFile.fromFile(
-        photo,
-        filename: "${DateTime.now().millisecondsSinceEpoch}_${photo.split('/').last}",
-      ),
+      'photo': photo,
       'latitude': latitude,
       'longitude': longitude,
+      'idType': idType,
     };
   }
 
@@ -56,6 +58,7 @@ class SiteOffline {
       photo: json['photo'],
       latitude: json['latitude'],
       longitude: json['longitude'],
+      idType: json['idType'],
     );
   }
 }

@@ -82,21 +82,6 @@ class GeolocatorRepository implements IGeolocatorRepository {
     return Geolocator.getPositionStream(locationSettings: _getAppleSettings());
   }
   
-  @override
-  double calculateDistance({
-    required double startLatitude,
-    required double startLongitude,
-    required double endLatitude,
-    required double endLongitude,
-  }) {
-    return Geolocator.distanceBetween(
-      startLatitude,
-      startLongitude,
-      endLatitude,
-      endLongitude,
-    );
-  }
-
   AppleSettings _getAppleSettings() {
     return AppleSettings(
       accuracy: LocationAccuracy.high,
@@ -132,10 +117,6 @@ abstract class IGeolocatorRepository {
   Future<Result<Position>> getCurrentPosition();
   Stream<Position> getPositionStreamAndroid();
   Stream<Position> getPositionStreamIOS();
-  double calculateDistance({
-    required double startLatitude,
-    required double startLongitude,
-    required double endLatitude,
-    required double endLongitude,
-  });
+ 
+ 
 }

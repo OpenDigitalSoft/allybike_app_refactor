@@ -30,14 +30,13 @@ class SetRouteMapCubit extends Cubit<SetRouteMapState> {
     return super.close();
   }
 
-  startTrackingRoute() async {
+  startTrackingRoute(int idRoute) async {
     _positionSub = _getPositionStream()!.listen((Position position) async {
       final lastPoint = LatLng(position.latitude, position.longitude);
       if (_lastPosition != null) {
-        final distance = const Distance().as(
-          LengthUnit.Meter,
-          _lastPosition!,
-          lastPoint,
+        final distance = _calculateDistance(
+          lastPoint: _lastPosition!,
+          currentPoint: lastPoint,
         );
         if (distance < 1) return;
       }
@@ -46,30 +45,22 @@ class SetRouteMapCubit extends Cubit<SetRouteMapState> {
       if (state is SetPositionCurrent) {
         final currentState = state as SetPositionCurrent;
         final totalDistance = _calculateDistance(
-          currentDistance: currentState.totalDistance,
-          lastPoint: lastPoint,
-          currentPoint: currentState.path.last,
+          lastPoint: currentState.position,
+          currentPoint: lastPoint,
         );
-        final updatedPath = List<LatLng>.from(currentState.path)..add(lastPoint);
+        final updatedPath = List<LatLng>.from(currentState.path)
+          ..add(lastPoint);
         emit(
           currentState.copyWith(
-            position: position,
+            position: lastPoint,
             path: updatedPath,
-            totalDistance: totalDistance,
+            totalDistance: currentState.totalDistance + totalDistance,
           ),
         );
         return;
       }
-      emit(SetPositionCurrent(position: position));
+      emit(SetPositionCurrent(position: lastPoint, idRoute: idRoute));
     });
-  }
-
-  setIdRoute(int idRoute) {
-    if (state is SetPositionCurrent &&
-        (state as SetPositionCurrent).idRoute == null) {
-      final currentState = state as SetPositionCurrent;
-      emit(currentState.copyWith(idRoute: idRoute));
-    }
   }
 
   setIdCalification(int idCalification) {
@@ -146,16 +137,14 @@ class SetRouteMapCubit extends Cubit<SetRouteMapState> {
   }
 
   double _calculateDistance({
-    required double currentDistance,
     required LatLng lastPoint,
     required LatLng currentPoint,
   }) {
-    final lastDistance = geolocatorRepository.calculateDistance(
-      startLatitude: lastPoint.latitude,
-      startLongitude: lastPoint.longitude,
-      endLatitude: currentPoint.latitude,
-      endLongitude: currentPoint.longitude,
+    final distance = const Distance().as(
+      LengthUnit.Meter,
+      lastPoint,
+      currentPoint,
     );
-    return currentDistance + lastDistance;
+    return distance;
   }
 }

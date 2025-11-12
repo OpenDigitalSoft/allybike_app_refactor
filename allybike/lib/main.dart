@@ -35,8 +35,8 @@ setupStorageApp() async {
 verifyUserLogin() async {
  final userState = dependencyRegister<UserCubit>().state;
  if(userState is GetUserSuccess){
-  await dependencyRegister<ILoginCubit>().verifyToken(userState.user);
-  //await dependencyRegister<LoginCubit>().logout();
+  await dependencyRegister<LoginCubit>().verifyToken(userState.user);
+ //dependencyRegister<LoginCubit>().logout();
  }
 }
 

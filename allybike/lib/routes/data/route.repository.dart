@@ -1,4 +1,5 @@
 import 'package:allybike/class/http.class.dart';
+import 'package:allybike/offline-data/models/difficulty.model.dart';
 import 'package:allybike/offline-data/models/image.model.dart';
 import 'package:allybike/offline-data/models/points.model.dart';
 import 'package:allybike/offline-data/models/site.model.dart';
@@ -24,6 +25,7 @@ class RouteRepository implements IRouteRepository {
       queryParameters: {"page": page, "idUser": idUser},
     );
   }
+
   @override
   Future<JsonListResult> getRoutesByText(String text) async {
     return _http.get("/routes/search", queryParameters: {"text": text});
@@ -36,7 +38,7 @@ class RouteRepository implements IRouteRepository {
       queryParameters: {"text": text, "idUser": idUser},
     );
   }
-  
+
   @override
   Future<JsonListResult> getRouteByFilter({
     int? idTypeRoute,
@@ -50,7 +52,7 @@ class RouteRepository implements IRouteRepository {
       },
     );
   }
-  
+
   @override
   Future<JsonListResult> getRoutesOfUserByFilter({
     int? idTypeRoute,
@@ -64,7 +66,7 @@ class RouteRepository implements IRouteRepository {
       },
     );
   }
-  
+
   @override
   Future<JsonResult> createInitialRoute({
     required String name,
@@ -73,36 +75,62 @@ class RouteRepository implements IRouteRepository {
     required int idLocation,
     required int idUser,
   }) async {
-    return _http.post("/routes", data: {
-      "name": name,
-      "descriptions": descriptions,
-      "idType": idType,
-      "idLocation": idLocation,
-      "idUser": idUser,
-    });
+    return _http.post(
+      "/routes",
+      data: {
+        "name": name,
+        "descriptions": descriptions,
+        "idType": idType,
+        "idLocation": idLocation,
+        "idUser": idUser,
+      },
+    );
   }
+
   @override
   Future<JsonListResult> saveSite(SiteOffline site) async {
-    return _http.post("/routes/sites", data: site.toJson());
+    return _http.post(
+      "/routes/sites",
+      data: FormData.fromMap({
+        ...site.toJson(),
+        "photo": await MultipartFile.fromFile(
+          site.photo,
+          filename:
+              "${DateTime.now().millisecondsSinceEpoch}_${site.photo.split('/').last}",
+        ),
+      }),
+    );
   }
-  
+
   @override
   Future<JsonListResult> savePoints(PointRouteOffline points) async {
     return _http.post("/routes/points", data: points.toJson());
   }
-  
+
   @override
   Future<JsonListResult> saveImageRoute(ImageRouteOffline image) async {
     final data = image.toJson();
-    return _http.post("/routes/image", data: {
-       "id": data['id'],
-       "image": await MultipartFile.fromFile(
-         data['image'],
-         filename: "${DateTime.now().millisecondsSinceEpoch}_${data['image'].split('/').last}",
-       ),
-    });
+    return _http.post(
+      "/routes/image",
+      data: FormData.fromMap({
+        "id": data['id'],
+        "image": await MultipartFile.fromFile(
+          data['image'],
+          filename:
+              "${DateTime.now().millisecondsSinceEpoch}_${data['image'].split('/').last}",
+        ),
+      }),
+    );
   }
-} 
+
+  @override
+  Future<JsonResult> updateDifficulty(DifficultyOffline difficulty) {
+    return _http.put(
+      "/routes/${difficulty.idRoute}",
+      data: {"idDifficulty": difficulty.idDifficulty},
+    );
+  }
+}
 
 abstract class IRouteRepository {
   Future<JsonListResult> getRouteByPage(int page);
@@ -127,4 +155,5 @@ abstract class IRouteRepository {
   Future<JsonListResult> saveSite(SiteOffline site);
   Future<JsonListResult> savePoints(PointRouteOffline points);
   Future<JsonListResult> saveImageRoute(ImageRouteOffline image);
+  Future<JsonResult> updateDifficulty(DifficultyOffline difficulty);
 }

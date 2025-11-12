@@ -127,6 +127,7 @@ class OfflineDataCubit extends HydratedCubit<OfflineDataState> {
   }
 
   Future<List<SiteOffline>> _saveSites(List<SiteOffline> sites) async {
+    print('Saving ${sites.length} sites');
     final results = await Future.wait(
       sites.map((site) async {
         final response = await _routeRepository.saveSite(site);
@@ -137,28 +138,33 @@ class OfflineDataCubit extends HydratedCubit<OfflineDataState> {
         return site.copyWith(syncStatus: status);
       }),
     );
+    print('Saved ${results.length} sites');
     return results;
   }
 
   Future<ImageRouteOffline> _saveImageRoute(
     ImageRouteOffline imageRoute,
   ) async {
+    print('Saving image route ${imageRoute.idRoute}');
     final response = await _routeRepository.saveImageRoute(imageRoute);
     final status = _mapErrorToStatus(response);
     if (status == SyncStatus.error) {
       addError("Error al guardar imagen de ruta ${imageRoute.idRoute}");
     }
+    print('Saved image route ${imageRoute.idRoute}');
     return imageRoute.copyWith(syncStatus: status);
   }
 
   Future<PointRouteOffline> _savePointsRoute(
     PointRouteOffline pointsRoute,
   ) async {
+    print('Saving points route ${pointsRoute.idRoute}');
     final response = await _routeRepository.savePoints(pointsRoute);
     final status = _mapErrorToStatus(response);
     if (status == SyncStatus.error) {
       addError("Error al guardar puntos de ruta ${pointsRoute.idRoute}");
     }
+    print('Saved points route ${pointsRoute.idRoute}');
     return pointsRoute.copyWith(syncStatus: status);
   }
 

@@ -4,8 +4,15 @@ import 'package:allybike/const/colors.conts.dart';
 import 'package:allybike/functions/validator-input.fuction.dart';
 import 'package:allybike/image-picker/domain/image_picker_cubit.dart';
 import 'package:allybike/main.dart';
+import 'package:allybike/offline-data/domain/offline_data_cubit.dart';
+import 'package:allybike/offline-data/models/difficulty.model.dart';
+import 'package:allybike/offline-data/models/image.model.dart';
+import 'package:allybike/offline-data/models/points.model.dart';
+import 'package:allybike/offline-data/models/route.model.dart';
 import 'package:allybike/offline-data/models/site.model.dart';
 import 'package:allybike/routes/domain/set-route-map/set_route_map_cubit.dart';
+import 'package:allybike/type-difficulty/domain/type_difficulty_cubit.dart';
+import 'package:allybike/type-difficulty/model/type-difficulty.model.dart';
 import 'package:allybike/type-sites/domain/type_site_cubit.dart';
 import 'package:allybike/type-sites/models/type-site.repository.dart';
 import 'package:allybike/widgets/appbars/appbar-home.widget.dart';
@@ -16,7 +23,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'dart:ui' as ui;
@@ -32,12 +38,22 @@ class CreateMapPointsRoutes extends StatefulWidget {
 class _CreateMapPointsRoutesState extends State<CreateMapPointsRoutes>
     with TickerProviderStateMixin {
   late AnimatedMapController animatedMapController;
+  
 
   @override
   void initState() {
     animatedMapController = AnimatedMapController(vsync: this);
-    context.read<SetRouteMapCubit>().startTrackingRoute();
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+       final args = ModalRoute.of(context)!.settings.arguments as Map;
+       context.read<SetRouteMapCubit>().startTrackingRoute(args["idRoute"]);
+     });
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    
+    super.didChangeDependencies();
   }
 
   @override
@@ -48,8 +64,6 @@ class _CreateMapPointsRoutesState extends State<CreateMapPointsRoutes>
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as Map;
-    final idRoute = args['idRoute'] as int;
     final cubit = context.read<SetRouteMapCubit>();
     return Scaffold(
       appBar: AppBarHomePage(
@@ -64,7 +78,6 @@ class _CreateMapPointsRoutesState extends State<CreateMapPointsRoutes>
               state.position.latitude,
               state.position.longitude,
             );
-            cubit.setIdRoute(idRoute);
             return FlutterMap(
               mapController: animatedMapController.mapController,
               options: _getMapOptions(position),
@@ -329,7 +342,7 @@ class _ActionButton extends StatelessWidget {
 }
 
 class _SiteForm extends StatefulWidget {
-  final Position position;
+  final LatLng position;
   const _SiteForm({required this.position});
 
   @override
@@ -403,6 +416,7 @@ class _SiteFormState extends State<_SiteForm> {
       photo: imagePath,
       latitude: widget.position.latitude,
       longitude: widget.position.longitude,
+      idType: int.parse(typeSite),
     );
     context.read<SetRouteMapCubit>().addSite(site);
     Navigator.pop(context);
@@ -526,11 +540,45 @@ class _FinishRoute extends StatelessWidget {
           _RoutePhoto(),
           _SetCalification(),
           Spacer(),
-          PrimaryButton(text: "Finalizar", onPressed: () {}),
+          PrimaryButton(
+          text: "Finalizar", onPressed: () {
+            context.read<SetRouteMapCubit>().stopTrackingRoute();
+            Navigator.pop(context);
+            final routeData = _getDataRouteMap(context);
+            context.read<OfflineDataCubit>().saveDataOffline(routeData);
+          }
+          ),
           SizedBox(height: 16),
         ],
       ),
     );
+  }
+
+  _getDataRouteMap(BuildContext context) {
+    final currentState = context.read<SetRouteMapCubit>().state as SetPositionCurrent; 
+    final routeOfflineData = RouteDataOffline(
+      id: currentState.idRoute!,
+      sites: currentState.sites,
+      imageRoute:  ImageRouteOffline(
+                   idRoute: currentState.idRoute!, 
+                   imagePath: currentState.photoRoute?.path ?? ""
+                   ),
+      pointsRoute: PointRouteOffline(
+                   distance: currentState.totalDistance,
+                   idRoute: currentState.idRoute!,
+                   points: currentState.path
+                   ),
+      difficultyRoute: DifficultyOffline(
+                      idRoute: currentState.idRoute!,
+                      idDifficulty: 3 // Aquí se debería obtener la calificación real
+                      ),
+    );
+    return routeOfflineData;
+  }
+
+  _validateData(BuildContext context) {
+     final currentState = context.read<SetRouteMapCubit>().state as SetPositionCurrent; 
+
   }
 }
 
@@ -569,46 +617,57 @@ class _SetCalification extends StatefulWidget {
 class _SetCalificationState extends State<_SetCalification> {
   int initialCalification = 1;
 
-  final Map<int, String> calificationLabels = {
-    1: "Muy fácil",
-    2: "Fácil",
-    3: "Intermedio",
-    4: "Difícil",
-    5: "Muy difícil",
-  };
-
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 150,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
+    return BlocBuilder<TypeDifficultyCubit, TypeDifficultyState>(
+      builder: (context, state) {
+        if (state is GetTypeDifficultyLoading) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (state is GetTypeDifficultySuccess){
+          final calificationLabels = _getMapTypeDifficulty(state.difficulty);
+        return SizedBox(
+          height: 150,
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ...List.generate(
-                5,
-                (index) => IconButton(
-                  icon: Icon(LucideIcons.flame, size: 40),
-                  color: index + 1 <= initialCalification
-                      ? PaleteColors.red
-                      : PaleteColors.gray100,
-                  onPressed: () => setState(() {
-                    initialCalification = index + 1;
-                  }),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ...List.generate(
+                    5,
+                    (index) => IconButton(
+                      icon: Icon(LucideIcons.flame, size: 40),
+                      color: index + 1 <= initialCalification
+                          ? PaleteColors.red
+                          : PaleteColors.gray100,
+                      onPressed: () => setState(() {
+                        initialCalification = index + 1;
+                      }),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+              Text(
+                calificationLabels[initialCalification] ?? '',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ],
           ),
-          SizedBox(height: 8),
-          Text(
-            calificationLabels[initialCalification] ?? '',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
+        );
+        }
+        return SizedBox.shrink();
+      },
     );
+  }
+
+  Map<int,String> _getMapTypeDifficulty(List<TypeDifficulty> difficultyList) {
+    final Map<int, String> difficultyMap = {};
+    for (var difficulty in difficultyList) {
+      difficultyMap[difficulty.id] = difficulty.description;
+    }
+    return difficultyMap;
   }
 }
 

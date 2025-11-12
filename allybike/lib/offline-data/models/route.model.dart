@@ -1,3 +1,4 @@
+import 'package:allybike/offline-data/models/difficulty.model.dart';
 import 'package:allybike/offline-data/models/image.model.dart';
 import 'package:allybike/offline-data/models/points.model.dart';
 import 'package:allybike/offline-data/models/site.model.dart';
@@ -7,12 +8,13 @@ class RouteDataOffline {
   final List<SiteOffline> sites;
   final PointRouteOffline pointsRoute;
   final ImageRouteOffline imageRoute;
-
+  final DifficultyOffline difficultyRoute;
   RouteDataOffline({
     required this.id,
     required this.sites,
     required this.pointsRoute,
     required this.imageRoute,
+    required this.difficultyRoute,
   });
 
 
@@ -21,12 +23,14 @@ class RouteDataOffline {
     List<SiteOffline>? sites,
     PointRouteOffline? pointsRoute,
     ImageRouteOffline? imageRoute,
+    DifficultyOffline? difficultyRoute,
   }) {
     return RouteDataOffline(
       id: id ?? this.id,
       sites: sites ?? this.sites,
       pointsRoute: pointsRoute ?? this.pointsRoute,
       imageRoute: imageRoute ?? this.imageRoute,
+      difficultyRoute: difficultyRoute ?? this.difficultyRoute,
     );
   }
 
@@ -36,6 +40,7 @@ class RouteDataOffline {
       'sites': sites.map((site) => site.toJson()).toList(),
       'pointsRoute': pointsRoute.toJson(),
       'imageRoute': imageRoute.toJson(),
+      'difficultyRoute': difficultyRoute.toJson(),
     };
   }
 
@@ -50,6 +55,9 @@ class RouteDataOffline {
       ),
       imageRoute: ImageRouteOffline.fromJson(
         json['imageRoute'] as Map<String, dynamic>,
+      ),
+      difficultyRoute: DifficultyOffline.fromJson(
+        json['difficultyRoute'] as Map<String, dynamic>,
       ),
     );
   }
