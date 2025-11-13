@@ -2,13 +2,13 @@ import 'package:allybike/widgets/buttons/primary/primary-button.widget.dart';
 import 'package:allybike/widgets/buttons/secundary/secundary-button.widget.dart';
 import 'package:flutter/material.dart';
 
-void showAlertDialog({
+Future<bool?> showAlertDialog({
   required BuildContext context,
   required String title,
   required String content,
   required Function()? onAccept
 }) {
-  showDialog(
+return  showDialog<bool>(
     context: context,
     barrierDismissible: false, // no se cierra tocando afuera
     builder: (BuildContext context) {
@@ -23,13 +23,13 @@ void showAlertDialog({
            children: [
               SmallSecundaryButton(
                 text: "Cancelar",
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.of(context).pop(false),
               ),
               SizedBox(width: 10),
               SmallPrimaryButton(
               text: "Aceptar",
               onPressed: (){
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(true);
                 onAccept?.call();
               },
               )

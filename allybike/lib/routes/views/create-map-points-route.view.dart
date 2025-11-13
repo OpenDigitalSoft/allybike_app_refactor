@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:allybike/const/colors.conts.dart';
+import 'package:allybike/functions/alert-dialog.function.dart';
 import 'package:allybike/functions/snack-bar.function.dart';
 import 'package:allybike/functions/validator-input.fuction.dart';
 import 'package:allybike/image-picker/domain/image_picker_cubit.dart';
@@ -67,75 +68,90 @@ class _CreateMapPointsRoutesState extends State<CreateMapPointsRoutes>
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<SetRouteMapCubit>();
-    return Scaffold(
-      appBar: AppBarHomePage(
-        icon: Icons.add_road_outlined,
-        title: "Trazar ruta",
-        centerTitle: true,
-      ),
-      body: BlocBuilder<SetRouteMapCubit, SetRouteMapState>(
-        builder: (context, state) {
-          if (state is SetPositionCurrent) {
-            final position = LatLng(
-              state.position.latitude,
-              state.position.longitude,
-            );
-            return FlutterMap(
-              mapController: animatedMapController.mapController,
-              options: _getMapOptions(position),
-              children: [
-                _LayerMap(),
-                _CenterButton(onPressed: () => _centerMap(position)),
-                Positioned(
-                  bottom: 20,
-                  left: 0,
-                  right: 0,
-                  child: _ListActions(state: state, cubit: cubit),
-                ),
-                if (state.path.isNotEmpty)
-                  PolylineLayer(
-                    polylines: [
-                      Polyline(
-                        points: state.path,
-                        color: Colors.blue,
-                        strokeWidth: 5,
+    return PopScope(
+           canPop: false,
+           onPopInvokedWithResult: (didPop, result) async {
+             if(didPop){
+               return;
+             }
+             await showAlertDialog(
+                   context: context, 
+                   title: "Salir sin guardar", 
+                   content: "Estas seguro de salir la ruta estara incompleta", 
+                   onAccept: () => Navigator.pop(context)
+                   );
+          
+           },
+           child: Scaffold(
+             appBar: AppBarHomePage(
+                     icon        : Icons.add_road_outlined,
+                     title       : "Trazar ruta",
+                     centerTitle : true,
+             ),
+             body: BlocBuilder<SetRouteMapCubit, SetRouteMapState>(
+               builder: (context, state) {
+            if (state is SetPositionCurrent) {
+              final position = LatLng(
+                state.position.latitude,
+                state.position.longitude,
+              );
+              return FlutterMap(
+                mapController: animatedMapController.mapController,
+                options: _getMapOptions(position),
+                children: [
+                  _LayerMap(),
+                  _CenterButton(onPressed: () => _centerMap(position)),
+                  Positioned(
+                    bottom: 20,
+                    left: 0,
+                    right: 0,
+                    child: _ListActions(state: state, cubit: cubit),
+                  ),
+                  if (state.path.isNotEmpty)
+                    PolylineLayer(
+                      polylines: [
+                        Polyline(
+                          points: state.path,
+                          color: Colors.blue,
+                          strokeWidth: 5,
+                        ),
+                      ],
+                    ),
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        width: 20.0,
+                        height: 20.0,
+                        point: position,
+                        child: _PositionMarker(),
+                      ),
+                      ...state.sites.map(
+                        (site) => Marker(
+                          width: 65.0,
+                          height: 65.0,
+                          alignment: Alignment.lerp(
+                            Alignment.topCenter,
+                            Alignment.center,
+                            -0.4,
+                          )!,
+                          point: LatLng(site.latitude, site.longitude),
+                          child: _ImageMarker(
+                            imageUrl: site.photo,
+                            size: 65,
+                            borderColor: Colors.white,
+                            borderWidth: 4,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      width: 20.0,
-                      height: 20.0,
-                      point: position,
-                      child: _PositionMarker(),
-                    ),
-                    ...state.sites.map(
-                      (site) => Marker(
-                        width: 65.0,
-                        height: 65.0,
-                        alignment: Alignment.lerp(
-                          Alignment.topCenter,
-                          Alignment.center,
-                          -0.4,
-                        )!,
-                        point: LatLng(site.latitude, site.longitude),
-                        child: _ImageMarker(
-                          imageUrl: site.photo,
-                          size: 65,
-                          borderColor: Colors.white,
-                          borderWidth: 4,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            );
-          }
-          return Center(child: CircularProgressIndicator());
-        },
-      ),
+                ],
+              );
+            }
+            return Center(child: CircularProgressIndicator());
+          },
+             ),
+           ),
     );
   }
 
