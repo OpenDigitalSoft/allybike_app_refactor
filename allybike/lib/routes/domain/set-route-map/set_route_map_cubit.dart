@@ -109,6 +109,13 @@ class SetRouteMapCubit extends Cubit<SetRouteMapState> {
     _positionSub = null;
   }
 
+  addCalification(int calification) {
+    if (state is SetPositionCurrent) {
+      final currentState = state as SetPositionCurrent;
+      emit(currentState.copyWith(idCalification: calification));
+    }
+  }
+
   _checkPermissionCamera() async {
     final hasPermission = await imagePickerRepository.requestPermission();
     if (!hasPermission) {

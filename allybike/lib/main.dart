@@ -36,7 +36,7 @@ verifyUserLogin() async {
  final userState = dependencyRegister<UserCubit>().state;
  if(userState is GetUserSuccess){
   await dependencyRegister<LoginCubit>().verifyToken(userState.user);
- //dependencyRegister<LoginCubit>().logout();
+  //dependencyRegister<LoginCubit>().logout();
  }
 }
 

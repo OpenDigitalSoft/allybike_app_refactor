@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:allybike/const/colors.conts.dart';
+import 'package:allybike/functions/snack-bar.function.dart';
 import 'package:allybike/functions/validator-input.fuction.dart';
 import 'package:allybike/image-picker/domain/image_picker_cubit.dart';
 import 'package:allybike/main.dart';
@@ -11,6 +12,7 @@ import 'package:allybike/offline-data/models/points.model.dart';
 import 'package:allybike/offline-data/models/route.model.dart';
 import 'package:allybike/offline-data/models/site.model.dart';
 import 'package:allybike/routes/domain/set-route-map/set_route_map_cubit.dart';
+import 'package:allybike/routes/views/routes-user.view.dart';
 import 'package:allybike/type-difficulty/domain/type_difficulty_cubit.dart';
 import 'package:allybike/type-difficulty/model/type-difficulty.model.dart';
 import 'package:allybike/type-sites/domain/type_site_cubit.dart';
@@ -543,9 +545,11 @@ class _FinishRoute extends StatelessWidget {
           PrimaryButton(
           text: "Finalizar", onPressed: () {
             context.read<SetRouteMapCubit>().stopTrackingRoute();
+            if(!_validateData(context)) return;
             Navigator.pop(context);
             final routeData = _getDataRouteMap(context);
             context.read<OfflineDataCubit>().saveDataOffline(routeData);
+            Navigator.pushNamedAndRemoveUntil(context,RoutesUserView.route, (route) => false);
           }
           ),
           SizedBox(height: 16),
@@ -578,7 +582,15 @@ class _FinishRoute extends StatelessWidget {
 
   _validateData(BuildContext context) {
      final currentState = context.read<SetRouteMapCubit>().state as SetPositionCurrent; 
-
+     if(currentState.photoRoute == null) {
+       snackBar(text: "Agrega una foto de la ruta", context: context);
+       return false;
+     }
+     if(currentState.path.length < 10) {
+       snackBar(text: "La ruta es muy corta", context: context);
+       return false;
+     }
+     return true;
   }
 }
 
@@ -643,6 +655,9 @@ class _SetCalificationState extends State<_SetCalification> {
                           : PaleteColors.gray100,
                       onPressed: () => setState(() {
                         initialCalification = index + 1;
+                        context
+                            .read<SetRouteMapCubit>()
+                            .addCalification(initialCalification);
                       }),
                     ),
                   ),

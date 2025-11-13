@@ -6,6 +6,7 @@ Future<void> snackBar({
   String action = 'Aceptar',
   Function()? onPressed,
   Function()? onclose,
+  bool floating = true
 }) async {
   final snackBar = SnackBar(
     
@@ -16,8 +17,8 @@ Future<void> snackBar({
       textColor: Theme.of(context).primaryColor,
     ),
     duration: const Duration(seconds: 2),
-    behavior: SnackBarBehavior.fixed,
-    
+    behavior: floating ? SnackBarBehavior.floating : SnackBarBehavior.fixed,
+    elevation: 100000.0,
   );
   ScaffoldMessenger.of(
     context,
