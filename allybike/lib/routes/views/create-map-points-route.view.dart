@@ -13,11 +13,11 @@ import 'package:allybike/offline-data/models/points.model.dart';
 import 'package:allybike/offline-data/models/route.model.dart';
 import 'package:allybike/offline-data/models/site.model.dart';
 import 'package:allybike/routes/domain/set-route-map/set_route_map_cubit.dart';
-import 'package:allybike/routes/views/routes-user.view.dart';
 import 'package:allybike/type-difficulty/domain/type_difficulty_cubit.dart';
 import 'package:allybike/type-difficulty/model/type-difficulty.model.dart';
 import 'package:allybike/type-sites/domain/type_site_cubit.dart';
 import 'package:allybike/type-sites/models/type-site.repository.dart';
+import 'package:allybike/user/domain/user_cubit.dart';
 import 'package:allybike/widgets/appbars/appbar-home.widget.dart';
 import 'package:allybike/widgets/buttons/primary/primary-button.widget.dart';
 import 'package:allybike/widgets/formfileds/input.widget.dart';
@@ -565,7 +565,9 @@ class _FinishRoute extends StatelessWidget {
             Navigator.pop(context);
             final routeData = _getDataRouteMap(context);
             context.read<OfflineDataCubit>().saveDataOffline(routeData);
-            Navigator.pushNamedAndRemoveUntil(context,RoutesUserView.route, (route) => false);
+            Navigator.of(context)
+                ..pop()
+                ..pop();
           }
           ),
           SizedBox(height: 16),
@@ -576,6 +578,7 @@ class _FinishRoute extends StatelessWidget {
 
   _getDataRouteMap(BuildContext context) {
     final currentState = context.read<SetRouteMapCubit>().state as SetPositionCurrent; 
+    final userState = context.read<UserCubit>().state as GetUserSuccess;
     final routeOfflineData = RouteDataOffline(
       id: currentState.idRoute!,
       sites: currentState.sites,
@@ -586,7 +589,8 @@ class _FinishRoute extends StatelessWidget {
       pointsRoute: PointRouteOffline(
                    distance: currentState.totalDistance,
                    idRoute: currentState.idRoute!,
-                   points: currentState.path
+                   points: currentState.path,
+                   idUser: userState.user.id
                    ),
       difficultyRoute: DifficultyOffline(
                       idRoute: currentState.idRoute!,

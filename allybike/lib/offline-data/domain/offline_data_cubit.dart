@@ -154,13 +154,24 @@ class OfflineDataCubit extends HydratedCubit<OfflineDataState> {
   Future<PointRouteOffline> _savePointsRoute(
     PointRouteOffline pointsRoute,
   ) async {
-    print('Saving points route ${pointsRoute.idRoute}');
-    final response = await _routeRepository.savePoints(pointsRoute);
+    await pointsRoute.toFile();
+    final response = pointsRoute.points.length > 1000
+      ? await _routeRepository.savePointWithFile(
+        pointsRoute,
+        pointsRoute.idUser,
+        pointsRoute.file
+        )
+      : await _routeRepository.savePoints(pointsRoute);
+    
     final status = _mapErrorToStatus(response);
     if (status == SyncStatus.error) {
       addError("Error al guardar puntos de ruta ${pointsRoute.idRoute}");
     }
-    print('Saved points route ${pointsRoute.idRoute}');
+    pointsRoute.file.exists().then((fileExists) {
+      if (fileExists) {
+        pointsRoute.file.delete();
+      }
+    });
     return pointsRoute.copyWith(syncStatus: status);
   }
 

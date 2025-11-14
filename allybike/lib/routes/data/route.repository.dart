@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:allybike/class/http.class.dart';
 import 'package:allybike/offline-data/models/difficulty.model.dart';
 import 'package:allybike/offline-data/models/image.model.dart';
@@ -117,7 +119,7 @@ class RouteRepository implements IRouteRepository {
         "image": await MultipartFile.fromFile(
           data['image'],
           filename:
-              "${DateTime.now().millisecondsSinceEpoch}_${data['image'].split('/').last}",
+              "${data['id']}_${data['image'].split('/').last}",
         ),
       }),
     );
@@ -128,6 +130,25 @@ class RouteRepository implements IRouteRepository {
     return _http.put(
       "/routes/${difficulty.idRoute}",
       data: {"idDifficulty": difficulty.idDifficulty},
+    );
+  }
+
+  @override
+  Future<JsonResult> savePointWithFile(
+    PointRouteOffline points,
+    int idUser,
+    File filePoints,
+  ) async {
+    return _http.post(
+      "/routes/points/file",
+      data: FormData.fromMap({
+        "idUser": idUser,
+        "idRoute": points.idRoute,
+        "points": MultipartFile.fromFileSync(
+          filePoints.path,
+          filename: "points.json",
+        ),
+      }),
     );
   }
 }
@@ -154,6 +175,11 @@ abstract class IRouteRepository {
   });
   Future<JsonListResult> saveSite(SiteOffline site);
   Future<JsonListResult> savePoints(PointRouteOffline points);
+  Future<JsonResult> savePointWithFile(
+    PointRouteOffline points,
+    int idUser,
+    File filePoints
+  );
   Future<JsonListResult> saveImageRoute(ImageRouteOffline image);
   Future<JsonResult> updateDifficulty(DifficultyOffline difficulty);
 }

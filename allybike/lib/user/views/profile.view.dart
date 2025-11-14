@@ -1,5 +1,4 @@
 import 'package:allybike/const/colors.conts.dart';
-import 'package:allybike/main.dart';
 import 'package:allybike/routes/domain/routes-user/routes_user_cubit.dart';
 import 'package:allybike/routes/views/routes-user.view.dart';
 import 'package:allybike/user/domain/user_cubit.dart';
@@ -15,8 +14,7 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     final stateUser = dependencyRegister<UserCubit>().state;
-     final idUser = (stateUser as GetUserSuccess).user.id;
+
 
     return  Scaffold(
             appBar: AppBarHomePage(
@@ -33,8 +31,9 @@ class ProfileView extends StatelessWidget {
                                     icon: Icons.social_distance_outlined, 
                                     label: "Mis rutas", 
                                     onTap: () {
+                                     final userState = context.read<UserCubit>().state as GetUserSuccess;
                                      Navigator.pushNamed(context, RoutesUserView.route);
-                                     context.read<RoutesUserCubit>().getInitialRoutes(idUser);
+                                     context.read<RoutesUserCubit>().getInitialRoutes(userState.user.id);
                                     }
                                     ),
                                    _ProfileOption(
